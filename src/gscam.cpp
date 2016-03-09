@@ -129,9 +129,9 @@ namespace gscam {
     sink_ = gst_element_factory_make("appsink",NULL);
     GstCaps * caps = NULL;
     if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {
-        caps = gst_caps_new_simple("video/x-raw-rgb", NULL); 
+        caps = gst_caps_new_simple("video/x-raw-rgb", "bpp", G_TYPE_INT, 24, NULL);
     } else if (image_encoding_ == sensor_msgs::image_encodings::MONO8) {
-        caps = gst_caps_new_simple("video/x-raw-gray", NULL);
+        caps = gst_caps_new_simple("video/x-raw-gray", "bpp", G_TYPE_INT, 8, NULL);
     } else if (image_encoding_ == "jpeg") {
         caps = gst_caps_new_simple("image/jpeg", NULL);
     }
@@ -307,9 +307,9 @@ namespace gscam {
               ? width_ * height_ * 3
               : width_ * height_;
 
-          if (buf->size < expected_frame_size) {
-              ROS_WARN_STREAM( "GStreamer image buffer underflow: Expected frame to be "
-                      << expected_frame_size << " bytes but got only "
+          if (buf->size != expected_frame_size) {
+              ROS_WARN_STREAM( "GStreamer image buffer mismatch: Expected frame to be "
+                      << expected_frame_size << " bytes but got "
                       << (buf->size) << " bytes. (make sure frames are correctly encoded)");
           }
 
